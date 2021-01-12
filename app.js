@@ -326,17 +326,16 @@ const mapStyle = [
    */
   function showStoresList(data, stores) {
     if (stores.length == 0) {
-      return;
+      return "Nothing here";
     }
   
-    let panel = document.createElement('div');
+    let panel = document.getElementById('store-list');
     // If the panel already exists, use it. Else, create it and add to the page.
-    if (document.getElementById('panel')) {
-      panel = document.getElementById('panel');
+    if (document.getElementById('store-list')) {
+      panel = document.getElementById('store-list');
     } else {
-      panel.setAttribute('id', 'panel');
-      const body = panel = document.getElementById('result');
-      body.insertBefore(panel, body.childNodes[0]);
+      panel = document.getElementById('store-list');
+      panel.insertBefore(panel, panel.childNodes[0]);
     }
   
   
