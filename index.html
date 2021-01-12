@@ -18,18 +18,20 @@
     #pac-card {
       background-color: #fff;
       border-radius: 2px 0 0 2px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
       box-sizing: border-box;
       font-family: Roboto;
       margin: 10px 10px 0 0;
       -moz-box-sizing: border-box;
       outline: none;
+      left: 3.2rem;
+      position: relative;
+      width: 87%;
+      border-bottom: 1px solid rgba(0,0,0,.2);
     }
     
     #pac-container {
       padding-top: 12px;
       padding-bottom: 12px;
-      margin-right: 12px;
     }
     
     #pac-input {
@@ -37,22 +39,15 @@
       font-family: Roboto;
       font-size: 15px;
       font-weight: 300;
-      margin-left: 12px;
-      padding: 0 11px 0 13px;
+      padding: 0 11px 0 0px;
       text-overflow: ellipsis;
       width: 400px;
+      border: none;
     }
     
     #pac-input:focus {
-      border-color: #4d90fe;
-    }
-    
-    #title {
-      color: #fff;
-      background-color: #77bc1f;
-      font-size: 18px;
-      font-weight: 400;
-      padding: 6px 12px;
+      outline: none;
+      font-weight: 700;
     }
     
     .hidden {
@@ -105,12 +100,17 @@
 <body>
   <!-- The div to hold the map -->
   <div class="container">
-    <div id="panel" style="width: 30%"></div>
+    <div id="panel" style="width: 30%">
+      <div id="pac-card">
+        <div id="pac-input"></div>
+      </div>
+    </div>
     <div id="map" style="width: 70%"></div>
   </div>
   
 
   <script src="app.js"></script>
+  <script src="jquery-1.6.4.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdnX69tdR-uAK5gYWO4204dYoAuCtaKic&map_ids=a06114dc0cc24dda&libraries=places&callback=initMap">
   </script>
 </body>

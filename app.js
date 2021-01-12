@@ -121,7 +121,6 @@ const mapStyle = [
    * Initialize the Google Map.
    */
   
-  
   function initMap() {
     // Create the map.
     const map = new google.maps.Map(document.getElementById('map'), {
@@ -129,6 +128,10 @@ const mapStyle = [
       center: {lat: 52.632469, lng: -1.689423},
       styles: mapStyle,
     });
+    new google.maps.places.Autocomplete(
+        (document.getElementById('autocomplete')), {
+          types: ['geocode']
+        });
   
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(showPosition);
@@ -150,7 +153,7 @@ const mapStyle = [
   
   
     // Load the stores GeoJSON onto the map.
-    map.data.loadGeoJson('https://www.manes.lu/store-locator2/stores.json', {idPropertyName: 'storeid'});
+    map.data.loadGeoJson('stores.json', {idPropertyName: 'storeid'});
   
     // Define the custom marker icons, using the store's "category".
     map.data.setStyle((feature) => {
@@ -188,7 +191,7 @@ const mapStyle = [
     });
   
     // Build and add the search bar
-    const card = document.createElement('div');
+    const card = document.getElementById('pac-card');
     const titleBar = document.createElement('div');
     const title = document.createElement('div');
     const container = document.createElement('div');
@@ -197,19 +200,16 @@ const mapStyle = [
       types: ['address'],
       componentRestrictions: {country: 'gb'},
     };
-  
-    card.setAttribute('id', 'pac-card');
     title.setAttribute('id', 'title');
-    title.textContent = 'Find the nearest store';
+    title.textContent = 'Find a store';
     titleBar.appendChild(title);
     container.setAttribute('id', 'pac-container');
     input.setAttribute('id', 'pac-input');
     input.setAttribute('type', 'text');
-    input.setAttribute('placeholder', 'Enter an address');
+    input.setAttribute('placeholder', 'Find a store');
     container.appendChild(input);
     card.appendChild(titleBar);
     card.appendChild(container);
-    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(card);
   
     // Make the search bar into a Places Autocomplete search bar and select
     // which detail fields should be returned about the place that
@@ -240,7 +240,6 @@ const mapStyle = [
       originLocation = place.geometry.location;
       map.setCenter(originLocation);
       map.setZoom(9);
-      console.log(place);
   
       originMarker.setPosition(originLocation);
       originMarker.setVisible(true);
@@ -327,7 +326,6 @@ const mapStyle = [
    */
   function showStoresList(data, stores) {
     if (stores.length == 0) {
-      console.log('empty stores');
       return;
     }
   
