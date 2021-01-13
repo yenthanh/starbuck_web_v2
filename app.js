@@ -405,6 +405,8 @@ const mapStyle = [
         infoWindow.setPosition(position);
         infoWindow.setOptions({pixelOffset: new google.maps.Size(0, -30)});
         infoWindow.open(map);
+        map.setCenter(position);
+        map.setZoom(17);
       });
       const distanceText = document.createElement('p');
       distanceText.classList.add('distanceText');
