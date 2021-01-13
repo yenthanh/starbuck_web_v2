@@ -159,7 +159,7 @@ const mapStyle = [
     map.data.setStyle((feature) => {
       return {
         icon: {
-          url: `https://www.manes.lu/store-locator2/img/store.png`,
+          url: `store.png`,
           scaledSize: new google.maps.Size(40, 40),
         },
       };
@@ -176,7 +176,7 @@ const mapStyle = [
       const phone = event.feature.getProperty('phone');
       const position = event.feature.getGeometry().get();
       const content = sanitizeHTML`
-        <img style="float:left; width:200px; margin-top:30px" src="https://www.manes.lu/store-locator2/img/store.png">
+        <img style="float:left; width:200px; margin-top:30px" src="store.png">
         <div style="margin-left:220px; margin-bottom:20px;">
           <h2>${name}</h2><p>${description}</p>
           <p><b>Open:</b> ${hours}<br/><b>Phone:</b> ${phone}</p>
@@ -325,6 +325,13 @@ const mapStyle = [
    * distanceVal, and storeid property.
    */
   function showStoresList(data, stores) {
+    const map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 7,
+      center: {lat: 52.632469, lng: -1.689423},
+      styles: mapStyle,
+    });
+    const apiKey = 'AIzaSyDdnX69tdR-uAK5gYWO4204dYoAuCtaKic';
+    const infoWindow = new google.maps.InfoWindow();
     if (stores.length == 0) {
       return "Nothing here";
     }
@@ -349,8 +356,27 @@ const mapStyle = [
       const name = document.createElement('p');
       name.classList.add('place');
       const currentStore = data.getFeatureById(store.storeid);
-      name.textContent = currentStore.getProperty('name');
+      name.textContent = currentStore.j.name;
       panel.appendChild(name);
+      $(name).click(function(event){
+        const title = currentStore.getProperty('name');
+        const description = currentStore.getProperty('description');
+        const hours = currentStore.getProperty('hours');
+        const phone = currentStore.getProperty('phone');
+        const position = currentStore.getGeometry().get();
+        const content = sanitizeHTML`
+        <img style="float:left; width:200px; margin-top:30px" src="store.png">
+        <div style="margin-left:220px; margin-bottom:20px;">
+          <h2>${title}</h2><p>${description}</p>
+          <p><b>Open:</b> ${hours}<br/><b>Phone:</b> ${phone}</p>
+          <p><img src="https://maps.googleapis.com/maps/api/streetview?size=350x120&location=${position.lat()},${position.lng()}&key=${apiKey}"></p>
+        </div>
+        `;
+        infoWindow.setContent(content);
+        infoWindow.setPosition(position);
+        infoWindow.setOptions({pixelOffset: new google.maps.Size(0, -30)});
+        infoWindow.open(map);
+      });
       const distanceText = document.createElement('p');
       distanceText.classList.add('distanceText');
       distanceText.textContent = store.distanceText;
