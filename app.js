@@ -330,6 +330,15 @@ const mapStyle = [
       center: {lat: 52.632469, lng: -1.689423},
       styles: mapStyle,
     });
+    map.data.loadGeoJson('stores.json', {idPropertyName: 'storeid'});
+    map.data.setStyle((feature) => {
+      return {
+        icon: {
+          url: `store.png`,
+          scaledSize: new google.maps.Size(40, 40),
+        },
+      };
+    });
     const apiKey = 'AIzaSyDdnX69tdR-uAK5gYWO4204dYoAuCtaKic';
     const infoWindow = new google.maps.InfoWindow();
     if (stores.length == 0) {
