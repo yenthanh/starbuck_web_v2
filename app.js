@@ -424,15 +424,21 @@ const mapStyle = [
       hoursText.appendChild(image);
       const moreInfo = document.createElement('img');
       moreInfo.classList.add('moreInfo');
-      moreInfo.setAttribute("src", "store.png");
+      moreInfo.setAttribute("src", "dropdown.png");
       panel.appendChild(moreInfo);
       $(moreInfo).click(function(event){
         event.preventDefault();
     	  // create accordion variables
         var accordion = $(name);
         var accordionContent = accordion.next('.hoursText');
-  
-    	  // toggle accordion link open class
+        // toggle accordion link open class
+        $(moreInfo).toggleClass("down");
+        if(moreInfo.classList.contains('down')){
+          moreInfo.setAttribute("src", "dropup.png");
+        }
+        else{
+          moreInfo.setAttribute("src", "dropdown.png");
+        }
     	  // toggle accordion content
     	  accordionContent.slideToggle(250);
       });
