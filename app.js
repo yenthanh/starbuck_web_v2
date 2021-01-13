@@ -414,6 +414,10 @@ const mapStyle = [
       hoursText.classList.add('hoursText');
       hoursText.textContent = currentStore.getProperty('hours');
       panel.appendChild(hoursText);
+      const moreInfo = document.createElement('img');
+      moreInfo.classList.add('moreInfo');
+      moreInfo.setAttribute("src", "store.png");
+      panel.appendChild(moreInfo);
     });
   
     // Open the panel
