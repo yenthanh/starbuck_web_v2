@@ -410,10 +410,10 @@ const mapStyle = [
         map.setCenter(position);
         map.setZoom(17);
       });
-      const distanceText = document.createElement('p');
-      distanceText.classList.add('distanceText');
-      distanceText.textContent = store.distanceText;
-      panel.appendChild(distanceText);
+      const hoursText = document.createElement('p');
+      hoursText.classList.add('hoursText');
+      hoursText.textContent = currentStore.getProperty('hours');
+      panel.appendChild(hoursText);
     });
   
     // Open the panel
