@@ -387,6 +387,7 @@ const mapStyle = [
       const name = document.createElement('p');
       name.classList.add('place');
       const currentStore = data.getFeatureById(store.storeid);
+      const position = currentStore.getGeometry().get();
       name.textContent = currentStore.j.name;
       panel.appendChild(name);
       $(name).click(function(event){
@@ -394,7 +395,6 @@ const mapStyle = [
         const description = currentStore.getProperty('description');
         const hours = currentStore.getProperty('hours');
         const phone = currentStore.getProperty('phone');
-        const position = currentStore.getGeometry().get();
         const content = sanitizeHTML`
         <img style="float:left; width:200px; margin-top:30px" src="store.png">
         <div style="margin-left:220px; margin-bottom:20px;">
@@ -414,10 +414,28 @@ const mapStyle = [
       hoursText.classList.add('hoursText');
       hoursText.textContent = currentStore.getProperty('hours');
       panel.appendChild(hoursText);
+      const phone = document.createElement('p');
+      phone.classList.add('phone');
+      phone.textContent = currentStore.getProperty('phone');
+      hoursText.appendChild(phone);
+      const image = document.createElement('img');
+      image.classList.add('image');
+      image.setAttribute("src", "https://maps.googleapis.com/maps/api/streetview?size=350x120&location="+ position.lat()+ "," + position.lng()+ "&key=" + apiKey);
+      hoursText.appendChild(image);
       const moreInfo = document.createElement('img');
       moreInfo.classList.add('moreInfo');
       moreInfo.setAttribute("src", "store.png");
       panel.appendChild(moreInfo);
+      $(moreInfo).click(function(event){
+        event.preventDefault();
+    	  // create accordion variables
+        var accordion = $(name);
+        var accordionContent = accordion.next('.hoursText');
+  
+    	  // toggle accordion link open class
+    	  // toggle accordion content
+    	  accordionContent.slideToggle(250);
+      });
     });
   
     // Open the panel
