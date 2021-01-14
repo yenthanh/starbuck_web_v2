@@ -128,10 +128,6 @@ const mapStyle = [
       center: {lat: 52.632469, lng: -1.689423},
       styles: mapStyle,
     });
-    new google.maps.places.Autocomplete(
-        (document.getElementById('autocomplete')), {
-          types: ['geocode']
-        });
   
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(showPosition);
@@ -197,8 +193,7 @@ const mapStyle = [
     const container = document.createElement('div');
     const input = document.createElement('input');
     const options = {
-      types: ['address'],
-      componentRestrictions: {country: 'gb'},
+      types: [],
     };
     title.setAttribute('id', 'title');
     title.textContent = 'Find a store';
@@ -251,6 +246,117 @@ const mapStyle = [
   
       return;
     });
+    function showStoresList(data, stores) {
+      map.data.addListener('click', (event) => {
+        const name = event.feature.getProperty('name');
+        const description = event.feature.getProperty('description');
+        const hours = event.feature.getProperty('hours');
+        const phone = event.feature.getProperty('phone');
+        const position = event.feature.getGeometry().get();
+        const content = sanitizeHTML`
+          <img style="float:left; width:200px; margin-top:30px" src="store.png">
+          <div style="margin-left:220px; margin-bottom:20px;">
+            <h2>${name}</h2><p>${description}</p>
+            <p><b>Open:</b> ${hours}<br/><b>Phone:</b> ${phone}</p>
+            <p><img src="https://maps.googleapis.com/maps/api/streetview?size=350x120&location=${position.lat()},${position.lng()}&key=${apiKey}"></p>
+          </div>
+          `;
+    
+        infoWindow.setContent(content);
+        infoWindow.setPosition(position);
+        infoWindow.setOptions({pixelOffset: new google.maps.Size(0, -30)});
+        infoWindow.open(map);
+        map.setCenter(position);
+        map.setZoom(17);
+      });
+      const apiKey = 'AIzaSyDdnX69tdR-uAK5gYWO4204dYoAuCtaKic';
+      const infoWindow = new google.maps.InfoWindow();
+      if (stores.length == 0) {
+        return "Nothing here";
+      }
+    
+      let panel = document.getElementById('store-list');
+      // If the panel already exists, use it. Else, create it and add to the page.
+      if (document.getElementById('store-list')) {
+        panel = document.getElementById('store-list');
+      } else {
+        panel = document.getElementById('store-list');
+        panel.insertBefore(panel, panel.childNodes[0]);
+      }
+    
+    
+      // Clear the previous details
+      while (panel.lastChild) {
+        panel.removeChild(panel.lastChild);
+      }
+    
+      stores.forEach((store) => {
+        // Add store details with text formatting
+        const name = document.createElement('p');
+        name.classList.add('place');
+        const currentStore = data.getFeatureById(store.storeid);
+        const position = currentStore.getGeometry().get();
+        name.textContent = currentStore.j.name;
+        panel.appendChild(name);
+        $(name).click(function(event){
+          const title = currentStore.getProperty('name');
+          const description = currentStore.getProperty('description');
+          const hours = currentStore.getProperty('hours');
+          const phone = currentStore.getProperty('phone');
+          const content = sanitizeHTML`
+          <img style="float:left; width:200px; margin-top:30px" src="store.png">
+          <div style="margin-left:220px; margin-bottom:20px;">
+            <h2>${title}</h2><p>${description}</p>
+            <p><b>Open:</b> ${hours}<br/><b>Phone:</b> ${phone}</p>
+            <p><img src="https://maps.googleapis.com/maps/api/streetview?size=350x120&location=${position.lat()},${position.lng()}&key=${apiKey}"></p>
+          </div>
+          `;
+          infoWindow.setContent(content);
+          infoWindow.setPosition(position);
+          infoWindow.setOptions({pixelOffset: new google.maps.Size(0, -30)});
+          infoWindow.open(map);
+          map.setCenter(position);
+          map.setZoom(17);
+        });
+        const hoursText = document.createElement('p');
+        hoursText.classList.add('hoursText');
+        hoursText.textContent = currentStore.getProperty('hours');
+        panel.appendChild(hoursText);
+        const phone = document.createElement('p');
+        phone.classList.add('phone');
+        phone.textContent = currentStore.getProperty('phone');
+        hoursText.appendChild(phone);
+        const image = document.createElement('img');
+        image.classList.add('image');
+        image.setAttribute("src", "https://maps.googleapis.com/maps/api/streetview?size=350x120&location="+ position.lat()+ "," + position.lng()+ "&key=" + apiKey);
+        hoursText.appendChild(image);
+        const moreInfo = document.createElement('img');
+        moreInfo.classList.add('moreInfo');
+        moreInfo.setAttribute("src", "dropdown.png");
+        panel.appendChild(moreInfo);
+        $(moreInfo).click(function(event){
+          event.preventDefault();
+          // create accordion variables
+          var accordion = $(name);
+          var accordionContent = accordion.next('.hoursText');
+          // toggle accordion link open class
+          $(moreInfo).toggleClass("down");
+          if(moreInfo.classList.contains('down')){
+            moreInfo.setAttribute("src", "dropup.png");
+          }
+          else{
+            moreInfo.setAttribute("src", "dropdown.png");
+          }
+          // toggle accordion content
+          accordionContent.slideToggle(250);
+        });
+      });
+    
+      // Open the panel
+      panel.classList.add('open');
+    
+      return;
+    }
   }
   
   /**
@@ -324,128 +430,3 @@ const mapStyle = [
    * @param {object[]} stores An array of objects with a distanceText,
    * distanceVal, and storeid property.
    */
-  function showStoresList(data, stores) {
-    const map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 7,
-      center: {lat: 52.632469, lng: -1.689423},
-      styles: mapStyle,
-    });
-    map.data.loadGeoJson('stores.json', {idPropertyName: 'storeid'});
-    map.data.setStyle((feature) => {
-      return {
-        icon: {
-          url: `store.png`,
-          scaledSize: new google.maps.Size(40, 40),
-        },
-      };
-    });
-    map.data.addListener('click', (event) => {
-      const name = event.feature.getProperty('name');
-      const description = event.feature.getProperty('description');
-      const hours = event.feature.getProperty('hours');
-      const phone = event.feature.getProperty('phone');
-      const position = event.feature.getGeometry().get();
-      const content = sanitizeHTML`
-        <img style="float:left; width:200px; margin-top:30px" src="store.png">
-        <div style="margin-left:220px; margin-bottom:20px;">
-          <h2>${name}</h2><p>${description}</p>
-          <p><b>Open:</b> ${hours}<br/><b>Phone:</b> ${phone}</p>
-          <p><img src="https://maps.googleapis.com/maps/api/streetview?size=350x120&location=${position.lat()},${position.lng()}&key=${apiKey}"></p>
-        </div>
-        `;
-  
-      infoWindow.setContent(content);
-      infoWindow.setPosition(position);
-      infoWindow.setOptions({pixelOffset: new google.maps.Size(0, -30)});
-      infoWindow.open(map);
-      map.setCenter(position);
-      map.setZoom(17);
-    });
-    const apiKey = 'AIzaSyDdnX69tdR-uAK5gYWO4204dYoAuCtaKic';
-    const infoWindow = new google.maps.InfoWindow();
-    if (stores.length == 0) {
-      return "Nothing here";
-    }
-  
-    let panel = document.getElementById('store-list');
-    // If the panel already exists, use it. Else, create it and add to the page.
-    if (document.getElementById('store-list')) {
-      panel = document.getElementById('store-list');
-    } else {
-      panel = document.getElementById('store-list');
-      panel.insertBefore(panel, panel.childNodes[0]);
-    }
-  
-  
-    // Clear the previous details
-    while (panel.lastChild) {
-      panel.removeChild(panel.lastChild);
-    }
-  
-    stores.forEach((store) => {
-      // Add store details with text formatting
-      const name = document.createElement('p');
-      name.classList.add('place');
-      const currentStore = data.getFeatureById(store.storeid);
-      const position = currentStore.getGeometry().get();
-      name.textContent = currentStore.j.name;
-      panel.appendChild(name);
-      $(name).click(function(event){
-        const title = currentStore.getProperty('name');
-        const description = currentStore.getProperty('description');
-        const hours = currentStore.getProperty('hours');
-        const phone = currentStore.getProperty('phone');
-        const content = sanitizeHTML`
-        <img style="float:left; width:200px; margin-top:30px" src="store.png">
-        <div style="margin-left:220px; margin-bottom:20px;">
-          <h2>${title}</h2><p>${description}</p>
-          <p><b>Open:</b> ${hours}<br/><b>Phone:</b> ${phone}</p>
-          <p><img src="https://maps.googleapis.com/maps/api/streetview?size=350x120&location=${position.lat()},${position.lng()}&key=${apiKey}"></p>
-        </div>
-        `;
-        infoWindow.setContent(content);
-        infoWindow.setPosition(position);
-        infoWindow.setOptions({pixelOffset: new google.maps.Size(0, -30)});
-        infoWindow.open(map);
-        map.setCenter(position);
-        map.setZoom(17);
-      });
-      const hoursText = document.createElement('p');
-      hoursText.classList.add('hoursText');
-      hoursText.textContent = currentStore.getProperty('hours');
-      panel.appendChild(hoursText);
-      const phone = document.createElement('p');
-      phone.classList.add('phone');
-      phone.textContent = currentStore.getProperty('phone');
-      hoursText.appendChild(phone);
-      const image = document.createElement('img');
-      image.classList.add('image');
-      image.setAttribute("src", "https://maps.googleapis.com/maps/api/streetview?size=350x120&location="+ position.lat()+ "," + position.lng()+ "&key=" + apiKey);
-      hoursText.appendChild(image);
-      const moreInfo = document.createElement('img');
-      moreInfo.classList.add('moreInfo');
-      moreInfo.setAttribute("src", "dropdown.png");
-      panel.appendChild(moreInfo);
-      $(moreInfo).click(function(event){
-        event.preventDefault();
-    	  // create accordion variables
-        var accordion = $(name);
-        var accordionContent = accordion.next('.hoursText');
-        // toggle accordion link open class
-        $(moreInfo).toggleClass("down");
-        if(moreInfo.classList.contains('down')){
-          moreInfo.setAttribute("src", "dropup.png");
-        }
-        else{
-          moreInfo.setAttribute("src", "dropdown.png");
-        }
-    	  // toggle accordion content
-    	  accordionContent.slideToggle(250);
-      });
-    });
-  
-    // Open the panel
-    panel.classList.add('open');
-  
-    return;
-  }
